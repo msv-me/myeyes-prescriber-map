@@ -15,9 +15,49 @@
     searchLng = null;
 
   // -----------------------------------------------------------------------
+  // Auth
+  // -----------------------------------------------------------------------
+  const PASS_HASH = "a0b1c8f4e6d2"; // lightweight check — not crypto-grade
+  function checkPass(input) {
+    return input === "myeyesmap";
+  }
+
+  // -----------------------------------------------------------------------
   // Init
   // -----------------------------------------------------------------------
-  document.addEventListener("DOMContentLoaded", init);
+  document.addEventListener("DOMContentLoaded", function () {
+    const gate = document.getElementById("login-gate");
+    const app = document.getElementById("app");
+    const passInput = document.getElementById("login-password");
+    const loginBtn = document.getElementById("login-btn");
+    const loginErr = document.getElementById("login-error");
+
+    // Already authenticated this session
+    if (sessionStorage.getItem("myeyes-map-auth") === "1") {
+      gate.classList.add("hidden");
+      app.classList.remove("hidden");
+      init();
+      return;
+    }
+
+    function attemptLogin() {
+      if (checkPass(passInput.value)) {
+        sessionStorage.setItem("myeyes-map-auth", "1");
+        gate.classList.add("hidden");
+        app.classList.remove("hidden");
+        init();
+      } else {
+        loginErr.textContent = "Incorrect password";
+        passInput.value = "";
+        passInput.focus();
+      }
+    }
+
+    loginBtn.addEventListener("click", attemptLogin);
+    passInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") attemptLogin();
+    });
+  });
 
   async function init() {
     initMap();

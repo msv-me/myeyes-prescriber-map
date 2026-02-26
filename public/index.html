@@ -10,6 +10,17 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <div id="login-gate">
+    <div class="login-box">
+      <h1>MyEyes Prescriber Map</h1>
+      <p>Enter the team password to continue</p>
+      <input type="password" id="login-password" placeholder="Password" autofocus />
+      <button id="login-btn">Sign In</button>
+      <p id="login-error" class="login-error"></p>
+    </div>
+  </div>
+
+  <div id="app" class="hidden">
   <header>
     <div class="header-content">
       <h1>MyEyes Prescriber Map</h1>
@@ -50,6 +61,7 @@
   </div>
 
   <div id="data-info"></div>
+  </div><!-- end #app -->
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
