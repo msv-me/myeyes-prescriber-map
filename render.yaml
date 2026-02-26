@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: myeyes-prescriber-map
+    runtime: static
+    buildCommand: echo "Static site — no build step"
+    staticPublishPath: ./public
+    pullRequestPreviewsEnabled: true
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=300
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

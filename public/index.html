@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyEyes Prescriber Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>MyEyes Prescriber Map</h1>
+      <p class="subtitle">Find nearby prescribers for HOME2 referrals</p>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="search-group">
+      <label for="zip-input">Patient Zip Code</label>
+      <input type="text" id="zip-input" placeholder="e.g. 07030" maxlength="5" pattern="[0-9]{5}" />
+    </div>
+    <div class="search-group">
+      <label for="radius-select">Search Radius</label>
+      <select id="radius-select">
+        <option value="10">10 miles</option>
+        <option value="25" selected>25 miles</option>
+        <option value="50">50 miles</option>
+        <option value="100">100 miles</option>
+        <option value="250">250 miles</option>
+      </select>
+    </div>
+    <button id="search-btn">Search</button>
+    <button id="clear-btn" class="secondary">Show All</button>
+    <span id="result-count"></span>
+  </div>
+
+  <div id="map"></div>
+
+  <div id="list-panel">
+    <h3>Prescribers <span id="list-count"></span></h3>
+    <div id="prescriber-list"></div>
+  </div>
+
+  <div id="loading" class="hidden">
+    <div class="spinner"></div>
+    <p>Loading prescriber data...</p>
+  </div>
+
+  <div id="data-info"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

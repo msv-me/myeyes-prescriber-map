@@ -1,0 +1,14 @@
+{
+  "name": "myeyes-prescriber-map",
+  "version": "1.0.0",
+  "description": "Prescriber map for MyEyes ambassador team — find nearby doctors who can prescribe HOME2",
+  "type": "module",
+  "scripts": {
+    "fetch": "node fetch-prescribers.js",
+    "serve": "npx http-server public -p 8080 -o",
+    "start": "npm run serve"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7"
+  }
+}
