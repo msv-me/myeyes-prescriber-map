@@ -91,6 +91,7 @@
       const info = document.getElementById("data-info");
       info.textContent = `Data generated: ${new Date(data.generated).toLocaleString()} | ${data.total} prescribers (${data.geocoded} mapped)`;
 
+      populateStateFilter();
       showPrescribers(allPrescribers);
     } catch (e) {
       console.error("Failed to load prescribers.json:", e);
@@ -101,12 +102,67 @@
     }
   }
 
+  function populateStateFilter() {
+    const states = [...new Set(
+      allPrescribers
+        .map((p) => p.address?.state)
+        .filter(Boolean)
+        .map((s) => s.trim().toUpperCase())
+    )].sort();
+
+    const select = document.getElementById("state-filter");
+    states.forEach((st) => {
+      const opt = document.createElement("option");
+      opt.value = st;
+      opt.textContent = st;
+      select.appendChild(opt);
+    });
+  }
+
+  function getFilteredPrescribers() {
+    const state = document.getElementById("state-filter").value;
+    if (!state) return allPrescribers;
+    return allPrescribers.filter(
+      (p) => p.address?.state && p.address.state.trim().toUpperCase() === state
+    );
+  }
+
   function bindEvents() {
     document.getElementById("search-btn").addEventListener("click", doSearch);
     document.getElementById("clear-btn").addEventListener("click", clearSearch);
     document.getElementById("zip-input").addEventListener("keydown", (e) => {
       if (e.key === "Enter") doSearch();
     });
+    document.getElementById("state-filter").addEventListener("change", applyStateFilter);
+  }
+
+  function applyStateFilter() {
+    const state = document.getElementById("state-filter").value;
+    const filtered = getFilteredPrescribers();
+
+    // Clear any active zip search
+    searchLat = null;
+    searchLng = null;
+    if (searchCircle) {
+      map.removeLayer(searchCircle);
+      searchCircle = null;
+    }
+    document.getElementById("result-count").textContent = state
+      ? `${filtered.length} prescriber${filtered.length !== 1 ? "s" : ""} in ${state}`
+      : "";
+
+    showPrescribers(filtered, !!state);
+
+    // Zoom to fit the filtered markers
+    if (state) {
+      const withCoords = filtered.filter((p) => p.lat && p.lng);
+      if (withCoords.length > 0) {
+        const bounds = L.latLngBounds(withCoords.map((p) => [p.lat, p.lng]));
+        map.fitBounds(bounds, { padding: [30, 30] });
+      }
+    } else {
+      map.setView([39.8, -98.5], 4);
+    }
   }
 
   // -----------------------------------------------------------------------
@@ -134,8 +190,9 @@
     searchLat = geo.lat;
     searchLng = geo.lng;
 
-    // Filter prescribers within radius
-    const nearby = allPrescribers
+    // Filter prescribers within radius (respect state filter if set)
+    const base = getFilteredPrescribers();
+    const nearby = base
       .filter((p) => p.lat && p.lng)
       .map((p) => ({
         ...p,
@@ -183,6 +240,7 @@
       searchCircle = null;
     }
     document.getElementById("zip-input").value = "";
+    document.getElementById("state-filter").value = "";
     document.getElementById("result-count").textContent = "";
     showPrescribers(allPrescribers);
     map.setView([39.8, -98.5], 4);
