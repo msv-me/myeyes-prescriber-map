@@ -102,19 +102,50 @@
     }
   }
 
+  // State name → 2-letter code normalization
+  const STATE_CODES = {
+    ALABAMA:"AL",ALASKA:"AK",ARIZONA:"AZ",ARKANSAS:"AR",CALIFORNIA:"CA",
+    COLORADO:"CO",CONNECTICUT:"CT",DELAWARE:"DE",FLORIDA:"FL",GEORGIA:"GA",
+    HAWAII:"HI",IDAHO:"ID",ILLINOIS:"IL",INDIANA:"IN",IOWA:"IA",KANSAS:"KS",
+    KENTUCKY:"KY",LOUISIANA:"LA",MAINE:"ME",MARYLAND:"MD",MASSACHUSETTS:"MA",
+    MICHIGAN:"MI",MINNESOTA:"MN",MISSISSIPPI:"MS",MISSOURI:"MO",MONTANA:"MT",
+    NEBRASKA:"NE",NEVADA:"NV","NEW HAMPSHIRE":"NH","NEW JERSEY":"NJ",
+    "NEW MEXICO":"NM","NEW YORK":"NY","NORTH CAROLINA":"NC","NORTH DAKOTA":"ND",
+    OHIO:"OH",OKLAHOMA:"OK",OREGON:"OR",PENNSYLVANIA:"PA","RHODE ISLAND":"RI",
+    "SOUTH CAROLINA":"SC","SOUTH DAKOTA":"SD",TENNESSEE:"TN",TEXAS:"TX",
+    UTAH:"UT",VERMONT:"VT",VIRGINIA:"VA",WASHINGTON:"WA","WEST VIRGINIA":"WV",
+    WISCONSIN:"WI",WYOMING:"WY","DISTRICT OF COLUMBIA":"DC",
+  };
+  const VALID_CODES = new Set(Object.values(STATE_CODES));
+
+  function normalizeState(raw) {
+    if (!raw) return null;
+    const upper = raw.trim().toUpperCase();
+    // Already a valid 2-letter code
+    if (VALID_CODES.has(upper)) return upper;
+    // Full name → code
+    if (STATE_CODES[upper]) return STATE_CODES[upper];
+    return null; // Non-US or unrecognized — exclude
+  }
+
   function populateStateFilter() {
     const states = [...new Set(
       allPrescribers
-        .map((p) => p.address?.state)
+        .map((p) => normalizeState(p.address?.state))
         .filter(Boolean)
-        .map((s) => s.trim().toUpperCase())
     )].sort();
 
     const select = document.getElementById("state-filter");
-    states.forEach((st) => {
+    const codeToName = {};
+    for (const [name, code] of Object.entries(STATE_CODES)) codeToName[code] = name;
+
+    states.forEach((code) => {
       const opt = document.createElement("option");
-      opt.value = st;
-      opt.textContent = st;
+      opt.value = code;
+      const fullName = codeToName[code];
+      opt.textContent = fullName
+        ? `${code} — ${fullName.charAt(0) + fullName.slice(1).toLowerCase()}`
+        : code;
       select.appendChild(opt);
     });
   }
@@ -123,7 +154,7 @@
     const state = document.getElementById("state-filter").value;
     if (!state) return allPrescribers;
     return allPrescribers.filter(
-      (p) => p.address?.state && p.address.state.trim().toUpperCase() === state
+      (p) => normalizeState(p.address?.state) === state
     );
   }
 

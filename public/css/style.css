@@ -124,32 +124,38 @@ header {
   letter-spacing: 0.5px;
 }
 
-#zip-input {
-  width: 130px;
-  padding: 8px 12px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 500;
-  transition: border-color 0.2s;
-}
-
-#zip-input:focus {
-  outline: none;
-  border-color: #2980b9;
-}
-
-#radius-select {
-  padding: 8px 12px;
+#zip-input,
+#radius-select,
+#state-filter {
+  height: 38px;
+  padding: 0 12px;
   border: 2px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
   background: white;
+  transition: border-color 0.2s;
+}
+
+#zip-input {
+  width: 120px;
+  font-weight: 500;
+}
+
+#zip-input:focus,
+#radius-select:focus,
+#state-filter:focus {
+  outline: none;
+  border-color: #2980b9;
+}
+
+#radius-select,
+#state-filter {
   cursor: pointer;
 }
 
 button {
-  padding: 8px 20px;
+  height: 38px;
+  padding: 0 20px;
   border: none;
   border-radius: 6px;
   font-size: 14px;
