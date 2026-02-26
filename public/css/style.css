@@ -184,15 +184,15 @@ button.secondary:hover {
 }
 
 #map {
-  height: calc(100vh - 230px);
-  min-height: 400px;
+  height: 55vh;
+  min-height: 300px;
 }
 
 #list-panel {
   background: white;
   padding: 16px 24px;
   border-top: 1px solid #e0e0e0;
-  max-height: 350px;
+  max-height: none;
   overflow-y: auto;
 }
 
