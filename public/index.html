@@ -30,6 +30,12 @@
   </header>
 
   <div class="controls">
+    <div class="search-group doctor-search-wrapper">
+      <label for="doctor-search">Doctor Name</label>
+      <input type="text" id="doctor-search" placeholder="Search by name..." autocomplete="off" />
+      <div id="doctor-results" class="doctor-results hidden"></div>
+    </div>
+    <div class="controls-divider"></div>
     <div class="search-group">
       <label for="zip-input">Patient Zip Code</label>
       <input type="text" id="zip-input" placeholder="e.g. 07030" maxlength="5" pattern="[0-9]{5}" />

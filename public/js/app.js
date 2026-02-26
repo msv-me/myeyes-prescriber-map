@@ -158,6 +158,100 @@
     );
   }
 
+  // -----------------------------------------------------------------------
+  // Doctor name search
+  // -----------------------------------------------------------------------
+  function initDoctorSearch() {
+    const input = document.getElementById("doctor-search");
+    const resultsEl = document.getElementById("doctor-results");
+
+    input.addEventListener("input", () => {
+      const query = input.value.trim().toLowerCase();
+      if (query.length < 2) {
+        resultsEl.classList.add("hidden");
+        return;
+      }
+
+      const matches = allPrescribers
+        .filter((p) => p.name && p.name.toLowerCase().includes(query))
+        .slice(0, 20);
+
+      if (matches.length === 0) {
+        resultsEl.innerHTML = '<div class="no-results">No doctors found</div>';
+      } else {
+        resultsEl.innerHTML = matches
+          .map(
+            (p, i) => `
+          <div class="doctor-result-item" data-index="${i}">
+            <div class="dr-name">${esc(p.name)}${p.specialty ? " <span class='badge badge-specialty'>" + esc(p.specialty) + "</span>" : ""}</div>
+            <div class="dr-detail">${esc(p.organization || "")}${p.address?.city ? " — " + esc(p.address.city) + ", " + esc(p.address.state || "") : ""}</div>
+          </div>`
+          )
+          .join("");
+
+        resultsEl.querySelectorAll(".doctor-result-item").forEach((item, i) => {
+          item.addEventListener("click", () => {
+            selectDoctor(matches[i]);
+            resultsEl.classList.add("hidden");
+            input.value = matches[i].name;
+          });
+        });
+      }
+
+      resultsEl.classList.remove("hidden");
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".doctor-search-wrapper")) {
+        resultsEl.classList.add("hidden");
+      }
+    });
+
+    // Re-open on focus if there's a query
+    input.addEventListener("focus", () => {
+      if (input.value.trim().length >= 2) {
+        input.dispatchEvent(new Event("input"));
+      }
+    });
+  }
+
+  function selectDoctor(p) {
+    if (!p.lat || !p.lng) {
+      alert("This doctor does not have a mapped location.");
+      return;
+    }
+
+    // Clear other filters
+    document.getElementById("zip-input").value = "";
+    document.getElementById("state-filter").value = "";
+    searchLat = null;
+    searchLng = null;
+    if (searchCircle) {
+      map.removeLayer(searchCircle);
+      searchCircle = null;
+    }
+
+    // Show all prescribers on map but zoom to the selected one
+    showPrescribers(allPrescribers);
+    map.setView([p.lat, p.lng], 15);
+
+    // Open the popup for this doctor's marker
+    setTimeout(() => {
+      markerCluster.eachLayer((layer) => {
+        const ll = layer.getLatLng();
+        if (
+          Math.abs(ll.lat - p.lat) < 0.0001 &&
+          Math.abs(ll.lng - p.lng) < 0.0001
+        ) {
+          layer.openPopup();
+        }
+      });
+    }, 300);
+
+    document.getElementById("result-count").textContent = `Selected: ${p.name}`;
+  }
+
   function bindEvents() {
     document.getElementById("search-btn").addEventListener("click", doSearch);
     document.getElementById("clear-btn").addEventListener("click", clearSearch);
@@ -165,6 +259,7 @@
       if (e.key === "Enter") doSearch();
     });
     document.getElementById("state-filter").addEventListener("change", applyStateFilter);
+    initDoctorSearch();
   }
 
   function applyStateFilter() {
